@@ -1,0 +1,5 @@
+jenkins-cli.jar
+jenkins-cli.sh
+.env
+notes.txt
+tmp/
