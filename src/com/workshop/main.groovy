@@ -44,7 +44,7 @@ def main(script) {
 
         stage('Pre Build - Checkout & Test') {
             String dockerTool = tool name: 'docker', type: 'dockerTool'
-            println("dockerTool")
+            println("${dockerTool}")
 
             withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
                 docker.image("${c.default_golang_base_image}:${golang_tag}").inside {
