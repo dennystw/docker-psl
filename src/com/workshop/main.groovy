@@ -43,13 +43,17 @@ def main(script) {
         }
 
         stage('Pre Build - Checkout & Test') {
-            tool name: 'docker', type: 'dockerTool'
-            docker.image("${c.default_golang_base_image}:${golang_tag}").inside {
-                // sprebuild.checkout()
-                git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
-                // sprebuild.buildTest()
-                // sprebuild.unitTest()
-                sh "pwd"
+            String dockerTool = tool name: 'docker', type: 'dockerTool'
+            println("dockerTool")
+
+            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
+                docker.image("${c.default_golang_base_image}:${golang_tag}").inside {
+                    // sprebuild.checkout()
+                    git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
+                    // sprebuild.buildTest()
+                    // sprebuild.unitTest()
+                    sh "pwd"
+                }
             }
         }
 
