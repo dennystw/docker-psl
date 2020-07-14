@@ -43,6 +43,7 @@ def main(script) {
         }
 
         stage('Pre Build - Checkout & Test') {
+            tool name: 'docker', type: 'dockerTool'
             docker.image("${c.default_golang_base_image}:${golang_tag}").inside {
                 // sprebuild.checkout()
                 git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
