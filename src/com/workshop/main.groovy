@@ -88,11 +88,12 @@ def main(script) {
 
         stage('Deploy') {
             println "Take Down previous Deployment"
-            sh "docker rm -f \$(docker ps -aq -f 'name=tkpd-demo')"
+            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
 
             def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
             image.run("--name ${repository_name}-$BUILD_NUMBER")
         }
+
         stage('Service Healthcheck') {
             spostdeploy.healthCheck()
         }
