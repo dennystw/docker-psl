@@ -97,10 +97,12 @@ def main(script) {
 
         stage('Deploy') {
             withEnv(["PATH+DOCKER=${dockerTool}/bin"]){
-                def response = sh script: "docker inspect ${repository_name}", returnStatus: true
                 println "Take Down previous Deployment"
+                def response = sh script: "docker rm -f \$(docker ps -aq -f 'name=${repository_name}') &> /dev/null", returnStatus: true
                 if ("${response}" == "0") {
-                    sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+                    println("Successfuly removing old container")
+                } else {
+                    println("Old version removed")
                 }
             }
 
