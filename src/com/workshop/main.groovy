@@ -8,6 +8,7 @@ import com.workshop.stages.*
 def main(script) {
     // Object initialization
     c = new Config()
+    u = new utils()
     sprebuild = new prebuild()
     sbuild = new build()
     spostbuild = new postbuild()
@@ -47,15 +48,44 @@ def main(script) {
             println("${dockerTool}")
 
             withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
-                sh "echo $PATH"
                 // sprebuild.checkout()
                 git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
 
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
                     // sprebuild.buildTest()
-                    // sprebuild.unitTest()
-                    sh "pwd && ls"
+                    def list_dir_go = sh returnStdout: true, script: "/bin/bash -c 'grep -l \"func\\ main()\" * -r | grep \"\\.go\$\" | xargs dirname'"
+                    for(build_dir in "${list_dir_go}".split('\n')) {
+                        dir("${build_dir}") {
+                            build_status["'${build_dir}'"] = [:]
+                            build_status["'${build_dir}'"]['val'] = "${build_dir}"
+                            build_status["'${build_dir}'"]['error_message'] = "Error building ${build_dir}, please read error log above"
+                            build_status["'${build_dir}'"]['label'] = "${build_dir}"
+
+                            println "----------------------------------"
+                            println "\u001b[36mBuilding \u001b[33m${build_dir}...\u001b[0m"
+
+                            build = sh returnStatus: true, script: "go build -v"
+                            if (build == 0) {
+                                build_status["'${build_dir}'"]['status'] = true
+                                println "\u001b[36mBuilding \u001b[33m${build_dir} \u001b[32mDONE !!!\u001b[0m"
+                            } else {
+                                build_status["'${build_dir}'"]['status'] = false
+                                println "\u001b[36mBuilding \u001b[33m${build_dir} \u001b[31mFAILED !!!\u001b[0m"
+                            }
+                            println "----------------------------------"
+                        }
+                    }
+                    println("=================\u001b[44mBuild Summary\u001b[0m================")
+                    def resultBuild = u.checkValidation(build_status)
+                    if (resultBuild) {
+                        println "\u001b[32mDone...\u001b[0m"
+                    } else {
+                        println "\u001b[31mThere are/is failed build, please revised above log!!!\u001b[0m"
+                        println "==============================================\n\n"
+                        error "Failed Build"
+                    }
+                    println "==============================================\n\n"
                 }
             }
         }
@@ -78,3 +108,5 @@ def main(script) {
     }
 
 }
+
+return this
