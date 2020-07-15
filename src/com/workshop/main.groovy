@@ -87,7 +87,8 @@ def main(script) {
         }
 
         stage('Deploy') {
-            docker.Image("${git_user}/${repository_name}:build-$BUILD_NUMBER").run("--name ${repository_name}-$BUILD_NUMBER")
+            def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
+            image.run("--name ${repository_name}-$BUILD_NUMBER")
         }
         stage('Service Healthcheck') {
             spostdeploy.healthCheck()
