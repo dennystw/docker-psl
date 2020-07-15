@@ -21,10 +21,12 @@ def main(script) {
     def repository_name = ("${script.env.repository_name}" != "null") ? "${script.env.repository_name}" : ""
     def branch_name = ("${script.env.branch_name}" != "null") ? "${script.env.branch_name}" : ""
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
+    def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
+
 
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
-
+    
     ansiColor('xterm') {
         stage('Pre Build - Details') {
             // sprebuild.details()
@@ -36,10 +38,16 @@ def main(script) {
                 "Branch name can't be empty"
                 error("ERROR101 - MISSING BRANCH_NAME")
             }
+            if(!app_port) {
+                "Application port can't be empty"
+                error("ERROR101 - MISSING APP_PORT")
+            }
 
             println("================\u001b[44mDetails Of Jobs\u001b[0m===============")
             println("\u001b[36mRepository Name : \u001b[0m${repository_name}")
             println("\u001b[36mBranch Name : \u001b[0m${branch_name}")
+            println("\u001b[36mApplication Port : \u001b[0m${app_port}")
+            
         }
 
         stage('Pre Build - Checkout & Test') {
@@ -88,14 +96,19 @@ def main(script) {
 
         stage('Deploy') {
             println "Take Down previous Deployment"
-            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}' -p ${app_port}:${app_port})"
 
             def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
             image.run("--name ${repository_name}-$BUILD_NUMBER")
         }
 
         stage('Service Healthcheck') {
-            spostdeploy.healthCheck()
+            def response =  sh script: "curl localhost:${app_port}/ping", returnStdout: true
+            if (response != "pong!"){
+                error("ERROR102 - Service is Unhealthy")
+            } else {
+                println "Service is Healthy :D"
+            }
         }
     }
 
