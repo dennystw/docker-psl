@@ -47,12 +47,15 @@ def main(script) {
             println("${dockerTool}")
 
             withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
-                docker.image("${c.default_golang_base_image}:${golang_tag}").inside {
-                    // sprebuild.checkout()
-                    git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
+                sh "echo $PATH"
+                // sprebuild.checkout()
+                git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
+
+                def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
+                golangImage.inside {
                     // sprebuild.buildTest()
                     // sprebuild.unitTest()
-                    sh "pwd"
+                    sh "pwd && ls"
                 }
             }
         }
