@@ -56,11 +56,11 @@ def main(script) {
                 // sh "git fetch origin pull/${p.pr_num}/head:pr/${p.pr_num}"
                 // sh "git merge --no-ff pr/${p.pr_num}"
                 git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
-                sh "go get -v"
 
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
                     // sprebuild.buildTest()
+                    sh "go get -v"
                     build = sh returnStatus: true, script: "go build -v"
                     if (build == 0) {
                         println "\u001b[36mBuilding \u001b[33m. \u001b[32mDONE !!!\u001b[0m"
@@ -70,6 +70,7 @@ def main(script) {
                     }
                 }
                 golangImage.inside {
+                    sh "go get -v"
                     test = sh returnStatus: true, script: "go test ./..."
                     if (build == 0) {
                         println "\u001b[36mTesting \u001b[33m. \u001b[32mDONE !!!\u001b[0m"
