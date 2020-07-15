@@ -65,7 +65,7 @@ def main(script) {
                         error("Build test failed")
                     }
                 }
-                golangImage.inside {
+                golangImage.inside("-u 0") {
                     test = sh returnStatus: true, script: "go test ./..."
                     if (build == 0) {
                         println "\u001b[36mTesting \u001b[33m. \u001b[32mDONE !!!\u001b[0m"
