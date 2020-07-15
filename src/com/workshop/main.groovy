@@ -60,6 +60,7 @@ def main(script) {
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
                     // sprebuild.buildTest()
+                    sh "apk add git"
                     sh "go get -v"
                     build = sh returnStatus: true, script: "go build -v"
                     if (build == 0) {
@@ -70,6 +71,7 @@ def main(script) {
                     }
                 }
                 golangImage.inside {
+                    sh "apk add git"
                     sh "go get -v"
                     test = sh returnStatus: true, script: "go test ./..."
                     if (build == 0) {
