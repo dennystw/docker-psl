@@ -96,8 +96,13 @@ def main(script) {
         }
 
         stage('Deploy') {
-            println "Take Down previous Deployment"
-            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+            withEnv(["PATH+DOCKER=${dockerTool}/bin"]){
+                def response = sh script: "docker inspect ${repository_name}", returnStatus: true
+                println "Take Down previous Deployment"
+                if ("${response}" == "0") {
+                    sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+                }
+            }
 
             docker.withTool('docker') {
                 def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
