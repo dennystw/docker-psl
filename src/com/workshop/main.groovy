@@ -50,7 +50,13 @@ def main(script) {
 
             withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
                 // sprebuild.checkout()
+                // println "============\u001b[44mCommencing PR Checkout\u001b[0m============"
+                // println "\u001b[36mChecking out from : \u001b[0mpull/${p.pr_num}/head:pr/${p.pr_num}..."
+                // sh "git branch -D pr/${p.pr_num} &> /dev/null || true"
+                // sh "git fetch origin pull/${p.pr_num}/head:pr/${p.pr_num}"
+                // sh "git merge --no-ff pr/${p.pr_num}"
                 git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
+                sh "go get -v"
 
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
