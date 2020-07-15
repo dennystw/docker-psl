@@ -113,8 +113,8 @@ def main(script) {
         }
 
         stage('Service Healthcheck') {
-            def hostIp = sh script: "ip route show | awk '/default/ {print \$3}'", returnStdout: true
-            def response =  sh script: "curl ${hostIp}:${app_port}/ping", returnStdout: true
+            def hostIp = sh script: "/bin/bash -c \"ip route show | awk '/default/ {print \$3}'\"", returnStdout: true
+            def response = sh script: "curl ${hostIp}:${app_port}/ping", returnStdout: true
             if (response != "pong!"){
                 error("ERROR102 - Service is Unhealthy")
             } else {
