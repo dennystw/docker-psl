@@ -20,6 +20,7 @@ def main(script) {
     // Mandatory variable wil be check at details & validation steps
     def repository_name = ("${script.env.repository_name}" != "null") ? "${script.env.repository_name}" : ""
     def branch_name = ("${script.env.branch_name}" != "null") ? "${script.env.branch_name}" : ""
+    def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
 
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
@@ -52,7 +53,7 @@ def main(script) {
                 // sh "git branch -D pr/${p.pr_num} &> /dev/null || true"
                 // sh "git fetch origin pull/${p.pr_num}/head:pr/${p.pr_num}"
                 // sh "git merge --no-ff pr/${p.pr_num}"
-                git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
+                git branch: "${branch_name}", url: "https://github.com/${git_user}/${repository_name}.git"
 
                 def golangImage = docker.image("${c.default_golang_base_image}")
                 golangImage.inside("-u 0") {
