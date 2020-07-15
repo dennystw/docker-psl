@@ -1,3 +1,6 @@
+#!/usr/bin/groovy
+package com.workshop
+
 def checkValidation(LinkedHashMap m){
     def overall_validation = true
     m.each {
