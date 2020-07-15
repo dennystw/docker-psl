@@ -55,38 +55,22 @@ def main(script) {
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
                     // sprebuild.buildTest()
-                    def list_dir_go = sh returnStdout: true, script: "/bin/sh -c 'grep -l \"func\\ main()\" * -r | grep \"\\.go\$\" | xargs dirname'"
-                    for(build_dir in "${list_dir_go}".split('\n')) {
-                        dir("${build_dir}") {
-                            build_status["'${build_dir}'"] = [:]
-                            build_status["'${build_dir}'"]['val'] = "${build_dir}"
-                            build_status["'${build_dir}'"]['error_message'] = "Error building ${build_dir}, please read error log above"
-                            build_status["'${build_dir}'"]['label'] = "${build_dir}"
-
-                            println "----------------------------------"
-                            println "\u001b[36mBuilding \u001b[33m${build_dir}...\u001b[0m"
-
-                            build = sh returnStatus: true, script: "go build -v"
-                            if (build == 0) {
-                                build_status["'${build_dir}'"]['status'] = true
-                                println "\u001b[36mBuilding \u001b[33m${build_dir} \u001b[32mDONE !!!\u001b[0m"
-                            } else {
-                                build_status["'${build_dir}'"]['status'] = false
-                                println "\u001b[36mBuilding \u001b[33m${build_dir} \u001b[31mFAILED !!!\u001b[0m"
-                            }
-                            println "----------------------------------"
-                        }
-                    }
-                    println("=================\u001b[44mBuild Summary\u001b[0m================")
-                    def resultBuild = u.checkValidation(build_status)
-                    if (resultBuild) {
-                        println "\u001b[32mDone...\u001b[0m"
+                    build = sh returnStatus: true, script: "go build -v"
+                    if (build == 0) {
+                        println "\u001b[36mBuilding \u001b[33m. \u001b[32mDONE !!!\u001b[0m"
                     } else {
-                        println "\u001b[31mThere are/is failed build, please revised above log!!!\u001b[0m"
-                        println "==============================================\n\n"
-                        error "Failed Build"
+                        println "\u001b[36mBuilding \u001b[33m. \u001b[31mFAILED !!!\u001b[0m"
+                        error("Build test failed")
                     }
-                    println "==============================================\n\n"
+                }
+                golangImage.inside {
+                    test = sh returnStatus: true, script: "go test ./..."
+                    if (build == 0) {
+                        println "\u001b[36mTesting \u001b[33m. \u001b[32mDONE !!!\u001b[0m"
+                    } else {
+                        println "\u001b[36mTesting \u001b[33m. \u001b[31mFAILED !!!\u001b[0m"
+                        error("Unit test failed")
+                    }
                 }
             }
         }
