@@ -27,6 +27,9 @@ def main(script) {
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
     
+    // Initialize docker tools
+    def dockerTool = tool name: 'docker', type: 'dockerTool'
+    
     ansiColor('xterm') {
         stage('Pre Build - Details') {
             // sprebuild.details()
@@ -51,10 +54,10 @@ def main(script) {
         }
 
         stage('Pre Build - Checkout & Test') {
-            String dockerTool = tool name: 'docker', type: 'dockerTool'
+            
             println("${dockerTool}")
 
-            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
+            docker.withTool('docker') {
                 // sprebuild.checkout()
                 // println "============\u001b[44mCommencing PR Checkout\u001b[0m============"
                 // println "\u001b[36mChecking out from : \u001b[0mpull/${p.pr_num}/head:pr/${p.pr_num}..."
@@ -87,19 +90,26 @@ def main(script) {
         }
 
         stage('Build & Push Image') {
-             docker.withRegistry(docker_registry, "cred-docker") {
-                def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
-                image.push()
-                image.push('latest')
+            docker.withTool('docker') {
+                 docker.withRegistry(docker_registry, "cred-docker") {
+                    def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
+                    image.push()
+                    image.push('latest')
+                }
             }
         }
 
         stage('Deploy') {
+            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
+                sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+            }
             println "Take Down previous Deployment"
-            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}' -p ${app_port}:${app_port})"
+            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
 
-            def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
-            image.run("--name ${repository_name}-$BUILD_NUMBER")
+            docker.withTool('docker') {
+                def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
+                image.run("--name ${repository_name}-$BUILD_NUMBER -p ${app_port}:${app_port}")
+            }
         }
 
         stage('Service Healthcheck') {
