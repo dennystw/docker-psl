@@ -77,16 +77,12 @@ def main(script) {
             }
         }
 
-        stage('Docker Build') {
-            sbuild.build()
-        }
-
-        stage('Push Docker Image') {
-            spostbuild.pushRegistry()
-        }
-
-        stage('Deploy') {
-            sdeploy.deploy()
+        stage('Build & Push Image') {
+             docker.withRegistry(docker_registry, "cred-docker") {
+                def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
+                image.push()
+                image.push('latest')
+            }
         }
 
         stage('Service Healthcheck') {
