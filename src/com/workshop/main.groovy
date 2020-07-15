@@ -55,7 +55,7 @@ def main(script) {
                 git branch: "${branch_name}", url: "https://github.com/tobapramudia/${repository_name}.git"
 
                 def golangImage = docker.image("${c.default_golang_base_image}")
-                golangImage.inside {
+                golangImage.inside("-u 0") {
                     // sprebuild.buildTest()
                     build = sh returnStatus: true, script: "go build -v"
                     if (build == 0) {
