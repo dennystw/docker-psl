@@ -55,7 +55,7 @@ def main(script) {
                 def golangImage = docker.image("${c.default_golang_base_image}:${golang_tag}")
                 golangImage.inside {
                     // sprebuild.buildTest()
-                    def list_dir_go = sh returnStdout: true, script: "/bin/bash -c 'grep -l \"func\\ main()\" * -r | grep \"\\.go\$\" | xargs dirname'"
+                    def list_dir_go = sh returnStdout: true, script: "/bin/sh -c 'grep -l \"func\\ main()\" * -r | grep \"\\.go\$\" | xargs dirname'"
                     for(build_dir in "${list_dir_go}".split('\n')) {
                         dir("${build_dir}") {
                             build_status["'${build_dir}'"] = [:]
