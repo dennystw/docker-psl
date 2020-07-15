@@ -21,10 +21,15 @@ def main(script) {
     def repository_name = ("${script.env.repository_name}" != "null") ? "${script.env.repository_name}" : ""
     def branch_name = ("${script.env.branch_name}" != "null") ? "${script.env.branch_name}" : ""
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
+    def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
+
 
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
-
+    
+    // Initialize docker tools
+    def dockerTool = tool name: 'docker', type: 'dockerTool'
+    
     ansiColor('xterm') {
         stage('Pre Build - Details') {
             // sprebuild.details()
@@ -36,17 +41,23 @@ def main(script) {
                 "Branch name can't be empty"
                 error("ERROR101 - MISSING BRANCH_NAME")
             }
+            if(!app_port) {
+                "Application port can't be empty"
+                error("ERROR101 - MISSING APP_PORT")
+            }
 
             println("================\u001b[44mDetails Of Jobs\u001b[0m===============")
             println("\u001b[36mRepository Name : \u001b[0m${repository_name}")
             println("\u001b[36mBranch Name : \u001b[0m${branch_name}")
+            println("\u001b[36mApplication Port : \u001b[0m${app_port}")
+            
         }
 
         stage('Pre Build - Checkout & Test') {
-            String dockerTool = tool name: 'docker', type: 'dockerTool'
+            
             println("${dockerTool}")
 
-            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
+            docker.withTool('docker') {
                 // sprebuild.checkout()
                 // println "============\u001b[44mCommencing PR Checkout\u001b[0m============"
                 // println "\u001b[36mChecking out from : \u001b[0mpull/${p.pr_num}/head:pr/${p.pr_num}..."
@@ -79,15 +90,35 @@ def main(script) {
         }
 
         stage('Build & Push Image') {
-             docker.withRegistry(docker_registry, "cred-docker") {
+            docker.withTool('docker') {
+                 docker.withRegistry(docker_registry, "cred-docker") {
+                    def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
+                    image.push()
+                    image.push('latest')
+                }
+            }
+        }
+
+        stage('Deploy') {
+            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
+                sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+            }
+            println "Take Down previous Deployment"
+            sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
+
+            docker.withTool('docker') {
                 def image = docker.build("${git_user}/${repository_name}:build-$BUILD_NUMBER")
-                image.push()
-                image.push('latest')
+                image.run("--name ${repository_name}-$BUILD_NUMBER -p ${app_port}:${app_port}")
             }
         }
 
         stage('Service Healthcheck') {
-            spostdeploy.healthCheck()
+            def response =  sh script: "curl localhost:${app_port}/ping", returnStdout: true
+            if (response != "pong!"){
+                error("ERROR102 - Service is Unhealthy")
+            } else {
+                println "Service is Healthy :D"
+            }
         }
     }
 
