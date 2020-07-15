@@ -23,7 +23,6 @@ def main(script) {
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
     def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
 
-
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
     
@@ -50,12 +49,9 @@ def main(script) {
             println("\u001b[36mRepository Name : \u001b[0m${repository_name}")
             println("\u001b[36mBranch Name : \u001b[0m${branch_name}")
             println("\u001b[36mApplication Port : \u001b[0m${app_port}")
-            
         }
 
         stage('Pre Build - Checkout & Test') {
-            
-            println("${dockerTool}")
 
             docker.withTool('docker') {
                 // sprebuild.checkout()
@@ -100,9 +96,6 @@ def main(script) {
         }
 
         stage('Deploy') {
-            withEnv(["PATH+DOCKER=${dockerTool}/bin"]) {
-                sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
-            }
             println "Take Down previous Deployment"
             sh "docker rm -f \$(docker ps -aq -f 'name=${repository_name}')"
 
