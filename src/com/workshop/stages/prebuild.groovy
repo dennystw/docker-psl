@@ -40,6 +40,7 @@ def checkoutBuildTest(Pipeline p) {
         println "============\u001b[44mCommencing PR Checkout\u001b[0m============"
         println "\u001b[36mChecking out from : \u001b[0mpull/${p.pr_num}/head:pr/${p.pr_num}..."
         sh "git config --global user.name '${git_username}'"
+        sh "git config --global user.email '${git_username}@example.com'"
         sh "git branch -D pr/${p.pr_num} &> /dev/null || true"
         sh "git fetch origin pull/${p.pr_num}/head:pr/${p.pr_num}"
         sh "git merge --no-ff pr/${p.pr_num}"
