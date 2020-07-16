@@ -23,6 +23,9 @@ def main(script) {
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
     def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
 
+    // Timeout for Healtcheck
+    def timeout_hc = (script.env.timeout_hc != "null") ? script.env.timeout_hc : 10
+
     // Have default value
     def docker_registry = ("${script.env.docker_registry}" != "null") ? "${script.env.docker_registry}" : "${c.default_docker_registry}"
     
@@ -113,16 +116,21 @@ def main(script) {
         }
 
         stage('Service Healthcheck') {
-            def hostIp = sh script: '/bin/bash -c "ip route show | awk \'/default/ {print \$3}\'"', returnStdout: true
-            def response = sh script: "curl ${hostIp}:${app_port}/ping", returnStdout: true
-            if (response != "pong!"){
-                error("ERROR102 - Service is Unhealthy")
-            } else {
-                println "Service is Healthy :D"
+            def hostIp = sh script: "ip route show | awk '/default/ {print \$3}' | tr -d '\n'", returnStdout: true
+
+            timeout(time: timeout_hc, unit: 'SECONDS'){
+                waitUntil(quiet: true) {
+                    def response = sh script: "curl ${hostIp}:${app_port}/ping", returnStdout: true
+                    if (response != "pong!"){
+                        error("ERROR102 - Service is Unhealthy for last ${timeout_hc} Second")
+                    } else {
+                        println "Service is Healthy :D"
+                        return true
+                    }
+                }
             }
         }
     }
-
 }
 
 return this
