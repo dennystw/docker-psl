@@ -9,6 +9,7 @@ class Pipeline implements Serializable {
     String pr_num
     String dockerTool
     String merge_url
+    String docker_registry
 
     Pipeline(
         String repository_name,
