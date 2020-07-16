@@ -3,7 +3,7 @@ package com.workshop.stages
 
 import com.workshop.Pipeline
 
-def healthCheck(Pipeline p) {
+def healthcheck(Pipeline p) {
     def hostIp = sh script: "ip route show | awk '/default/ {print \$3}' | tr -d '\n'", returnStdout: true
 
     timeout(time: p.timeout_hc, unit: 'SECONDS'){
