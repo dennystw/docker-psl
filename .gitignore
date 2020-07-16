@@ -3,3 +3,4 @@ jenkins-cli.sh
 .env
 notes.txt
 tmp/
+local-storage.json
