@@ -40,7 +40,8 @@ def main(script) {
         app_port,
         pr_num,
         dockerTool,
-        docker_registry
+        docker_registry,
+        timeout_hc
     )
 
     ansiColor('xterm') {
