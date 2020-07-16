@@ -22,7 +22,7 @@ def main(script) {
     def branch_name = ("${script.env.branch_name}" != "null") ? "${script.env.branch_name}" : ""
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
     def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
-    def pr_num = ("${script.eng.pr_num}") != "null") ? "${script.env.pr_num}" : ""
+    def pr_num = ("${script.env.pr_num}" != "null") ? "${script.env.pr_num}" : ""
 
     // Timeout for Healtcheck
     def timeout_hc = (script.env.timeout_hc != "null") ? script.env.timeout_hc : 10
