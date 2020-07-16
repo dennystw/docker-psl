@@ -39,7 +39,8 @@ def main(script) {
         git_user,
         app_port,
         pr_num,
-        dockerTool
+        dockerTool,
+        docker_registry
     )
 
     ansiColor('xterm') {
