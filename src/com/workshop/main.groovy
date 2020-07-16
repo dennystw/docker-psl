@@ -22,7 +22,7 @@ def main(script) {
     def branch_name = ("${script.env.branch_name}" != "null") ? "${script.env.branch_name}" : ""
     def git_user = ("${script.env.git_user}" != "null") ? "${script.env.git_user}" : ""
     def app_port = ("${script.env.app_port}" != "null") ? "${script.env.app_port}" : ""
-    def pr_num = ("${script.eng.pr_num}") != "null") ? "${script.env.pr)num}" : ""
+    def pr_num = ("${script.eng.pr_num}") != "null") ? "${script.env.pr_num}" : ""
 
     // Timeout for Healtcheck
     def timeout_hc = (script.env.timeout_hc != "null") ? script.env.timeout_hc : 10
@@ -44,6 +44,11 @@ def main(script) {
 
     ansiColor('xterm') {
         stage('Pre Build - Details') {
+            withCredentials([usernamePassword(credentialsId: 'dimasmamot-github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
+                // Check PR Merged atau belum
+                // Masukin ke variable
+            }
+
             sprebuild.validation(p)
             sprebuild.details(p)
         }
@@ -54,6 +59,16 @@ def main(script) {
 
         stage('Build & Push Image') {
             sbuild.build(p)
+        }
+
+        stage('Merge') {
+            withCredentials([usernamePassword(credentialsId: 'dimasmamot-github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
+                // Check pr merged atau belum dari variable is_merged
+                // Kalau sudah langsung deploy
+                // Kalau belum check apa merge nya udah berhasil atau ngga
+                // Kalau berhasil lanjut deploy
+                // Kalau gagal jangan lanjut
+            }
         }
 
         stage('Deploy') {
