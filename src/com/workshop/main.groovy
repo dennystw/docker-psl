@@ -46,7 +46,7 @@ def main(script) {
 
     ansiColor('xterm') {
         stage('Pre Build - Details') {
-            withCredentials([usernamePassword(credentialsId: 'dimasmamot-github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
+            withCredentials([usernamePassword(credentialsId: 'cred-git', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
                 // Check PR Merged atau belum
                 // Masukin ke variable
             }
@@ -64,7 +64,7 @@ def main(script) {
         }
 
         stage('Merge') {
-            withCredentials([usernamePassword(credentialsId: 'dimasmamot-github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
+            withCredentials([usernamePassword(credentialsId: 'cred-git', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
                 // Check pr merged atau belum dari variable is_merged
                 // Kalau sudah langsung deploy
                 // Kalau belum check apa merge nya udah berhasil atau ngga
@@ -79,6 +79,10 @@ def main(script) {
 
         stage('Service Healthcheck') {
             spostdeploy.healthcheck(p)
+        }
+
+        stage('Delete Old Image'){
+            spostdeploy.deleteOldImage(p)
         }
     }
 }

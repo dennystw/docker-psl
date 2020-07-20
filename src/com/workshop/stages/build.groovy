@@ -10,6 +10,7 @@ def build(Pipeline p) {
     docker.withTool("${c.default_docker_jenkins_tool}") {
         docker.withRegistry("${p.docker_registry}", "${c.default_docker_registry_jenkins_cred}") {
             def image = docker.build("${p.git_user}/${p.repository_name}:build-$BUILD_NUMBER")
+            println image
             image.push()
             image.push('latest')
         }

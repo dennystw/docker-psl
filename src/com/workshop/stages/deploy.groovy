@@ -19,6 +19,7 @@ def deploy(Pipeline p) {
 
     docker.withTool("${c.default_docker_jenkins_tool}") {
         def image = docker.build("${p.git_user}/${p.repository_name}:build-$BUILD_NUMBER")
+        println image
         image.run("--name ${p.repository_name}-$BUILD_NUMBER -p ${p.app_port}:${p.app_port}")
     }
 }

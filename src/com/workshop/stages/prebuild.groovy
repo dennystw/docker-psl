@@ -39,16 +39,18 @@ def checkoutBuildTest(Pipeline p) {
     withCredentials([usernamePassword(credentialsId: 'cred-git', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
         println "============\u001b[44mCommencing PR Checkout\u001b[0m============"
         println "\u001b[36mChecking out from : \u001b[0mpull/${p.pr_num}/head:pr/${p.pr_num}..."
+        git branch: "${p.branch_name}", url: "https://github.com/${p.git_user}/${p.repository_name}.git"
         sh "git config --global user.name '${git_username}'"
         sh "git config --global user.email '${git_username}@example.com'"
+        sh "pwd"
+        sh "git status"
+        sh "ls -la"
         sh "git branch -D pr/${p.pr_num} &> /dev/null || true"
         sh "git fetch origin pull/${p.pr_num}/head:pr/${p.pr_num}"
         sh "git merge --no-ff pr/${p.pr_num}"
     }
 
     docker.withTool("${c.default_docker_jenkins_tool}") {
-
-        git branch: "${p.branch_name}", url: "https://github.com/${p.git_user}/${p.repository_name}.git"
 
         def golangImage = docker.image("${c.default_golang_base_image}")
         golangImage.inside("-u 0") {

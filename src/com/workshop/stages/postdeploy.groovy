@@ -18,3 +18,15 @@ def healthcheck(Pipeline p) {
         }
     }
 }
+
+def deleteOldImage(Pipeline p) {
+    withEnv(["PATH+DOCKER=${p.dockerTool}/bin"]){
+        def output = sh script: "docker rmi \$(docker images | grep -Ev 'latest|${BUILD_NUMBER}' | awk '/${p.git_user}\\/${p.repository_name}/ {print \$1\":\"\$2}')", returnStdout: true
+        println "Remove old Image"
+        println output
+
+        def output2 = sh script: "docker image prune -f",  returnStdout: true
+        println "Remove unused images"
+        println output2
+    }
+}
