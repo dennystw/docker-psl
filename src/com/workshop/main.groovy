@@ -51,16 +51,17 @@ def main(script) {
                 // Masukin ke variable
             }
 
-            sprebuild.validation(p)
-            sprebuild.details(p)
+            // sprebuild.validation(p)
+            // sprebuild.details(p)
+            sprebuild.checkPR(p)
         }
 
         stage('Pre Build - Checkout & Test') {
-            sprebuild.checkoutBuildTest(p)
+            // sprebuild.checkoutBuildTest(p)
         }
 
         stage('Build & Push Image') {
-            sbuild.build(p)
+            // sbuild.build(p)
         }
 
         stage('Merge') {
@@ -74,11 +75,11 @@ def main(script) {
         }
 
         stage('Deploy') {
-            sdeploy.deploy(p)
+            // sdeploy.deploy(p)
         }
 
         stage('Service Healthcheck') {
-            spostdeploy.healthcheck(p)
+            // spostdeploy.healthcheck(p)
         }
     }
 }

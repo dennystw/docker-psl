@@ -9,4 +9,7 @@ class Config {
 
     // Golang related default variable
     def default_golang_base_image = "tobapramudia/tkpd-demo:onbuild"
+
+    // Github related default variable
+    def default_github_api_url = "https://api.github.com"
 }

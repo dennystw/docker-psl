@@ -14,6 +14,11 @@ def details(Pipeline p) {
     println("\u001b[36mMerging to branch : \u001b[0m${p.branch_name}")
 }
 
+def checkPR(Pipeline p) {
+    def response = httpRequest authentication: 'github-personal', responseHandle: 'NONE', url: 'https://api.github.com/repos/dimasmamot/tkpd-demo/pulls/1', wrapAsMultipart: false
+    println(response)
+}
+
 def validation(Pipeline p) {
     if(!p.repository_name) {
         "Repository name can't be empty"
