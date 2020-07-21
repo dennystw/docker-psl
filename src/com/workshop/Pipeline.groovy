@@ -11,6 +11,8 @@ class Pipeline implements Serializable {
     String merge_url
     String docker_registry
     String timeout_hc
+    
+    String is_merged
 
     Pipeline(
         String repository_name,

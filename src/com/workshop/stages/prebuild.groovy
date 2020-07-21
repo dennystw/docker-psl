@@ -34,7 +34,6 @@ def checkPR(Pipeline p) {
     println "==============================================\n\n"
 
     p.is_merged = "${parsed_git_pr_response['merged']}"
-    p.commit_hash = "${parsed_git_pr_response['merge_commit_sha']}".substring(0,4)
 }
 
 def validation(Pipeline p) {
