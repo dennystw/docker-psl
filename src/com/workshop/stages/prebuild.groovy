@@ -18,7 +18,7 @@ def checkPR(Pipeline p) {
     def git_pr_response = httpRequest authentication: 'github-personal', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/1", wrapAsMultipart: false
     def parsed_git_pr_response = readJSON text: "${git_pr_response.content}"
     
-    println("================\u001b[44mDetails Of Jobs\u001b[0m===============")
+    println("================\u001b[44mChecking base branch\u001b[0m===============")
     if ("${parsed_git_pr_response['base']['ref']}" != "${p.branch_name}") {
         error "Base branch on pull request is different than used in branch, used branch : ${p.branch_name}, your pull request base is pointed to : ${parsed_git_pr_response['base']['ref']}"
     }
