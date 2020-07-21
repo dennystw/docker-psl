@@ -12,18 +12,18 @@ def merge(Pipeline p){
 
     if (parsed_pr_merge_response.containsKey("merged")){
         if ("${parsed_pr_merge_response['merged']}" == "true") {
-            println "\u001b[32mMerging Success !!!"
+            println "\u001b[32mMerging Success !!!\u001b[0m"
             println "Message : \u001b[32m${parsed_pr_merge_response['message']}"
         } else {
-            println "\u001b[31mMerge Failed!!!"
-            println "Error message : \u001b[31m${parsed_pr_merge_response['message']}"
+            println "\u001b[31mMerge Failed!!!\u001b[0m"
+            println "Error message : \u001b[31m${parsed_pr_merge_response['message']}\u001b[0m"
             error "Failed to merge, ${parsed_pr_merge_response['message']}"
         }
     } else if ("${p.is_merged}" == "true") {
-        println "\u001b[32mPR Already Merged !!!"
+        println "\u001b[32mPR Already Merged !!!\u001b[0m"
     } else {
-        println "\u001b[31mMerge Failed!!!"
-        println "Error message : \u001b[31m${parsed_pr_merge_response['message']}"        
+        println "\u001b[31mMerge Failed!!!\u001b[0m"
+        println "Error message : \u001b[31m${parsed_pr_merge_response['message']}\u001b[0m"        
         error "Failed to merge, ${parsed_pr_merge_response['message']}"        
     }
     println "==============================================\n\n"
