@@ -5,10 +5,10 @@ import com.workshop.Pipeline
 
 def merge(Pipeline p){
     println "===========\u001b[44mMerging PR to base branch\u001b[0m=========="
-    println "\u001b[36mMerge method using : \u001b[0m${p.merge_method}..."
+    println "\u001b[36mMerge method using : \u001b[0mMerge..."
 
-    def pr_merge_response = sh returnStdout: true, script: "${p.merge_method_url}"
-    def parsed_pr_merge_response = jsonParse(pr_merge_response)
+    def pr_merge_response = httpRequest authentication: 'github-personal', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/${p.pr_num}/merge", wrapAsMultipart: false
+    def parsed_pr_merge_response = readJSON text: "${pr_merge_response.content}"
 
     if (parsed_pr_merge_response.containsKey("merged")){
         if ("${parsed_pr_merge_response['merged']}" == "true") {

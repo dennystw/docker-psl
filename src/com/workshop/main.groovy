@@ -10,6 +10,7 @@ def main(script) {
     // Object initialization
     c = new Config()
     u = new utils()
+    
     sprebuild = new prebuild()
     sbuild = new build()
     spostbuild = new postbuild()
@@ -46,11 +47,6 @@ def main(script) {
 
     ansiColor('xterm') {
         stage('Pre Build - Details') {
-            withCredentials([usernamePassword(credentialsId: 'github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
-                // Check PR Merged atau belum
-                // Masukin ke variable
-            }
-
             // sprebuild.validation(p)
             // sprebuild.details(p)
             sprebuild.checkPR(p)
@@ -65,13 +61,7 @@ def main(script) {
         }
 
         stage('Merge') {
-            withCredentials([usernamePassword(credentialsId: 'github-personal', passwordVariable: 'git_token', usernameVariable: 'git_username')]) {
-                // Check pr merged atau belum dari variable is_merged
-                // Kalau sudah langsung deploy
-                // Kalau belum check apa merge nya udah berhasil atau ngga
-                // Kalau berhasil lanjut deploy
-                // Kalau gagal jangan lanjut
-            }
+            spostbuild.merge(p)
         }
 
         stage('Deploy') {
