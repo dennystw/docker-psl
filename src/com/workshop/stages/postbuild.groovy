@@ -7,7 +7,7 @@ def merge(Pipeline p){
     println "===========\u001b[44mMerging PR to base branch\u001b[0m=========="
     println "\u001b[36mMerge method using : \u001b[0mMerge..."
 
-    def pr_merge_response = httpRequest authentication: 'github-personal', httpMode: 'PUT', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/${p.pr_num}/merge", wrapAsMultipart: false
+    def pr_merge_response = httpRequest authentication: 'github-personal', httpMode: 'PUT', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/${p.pr_num}/merge", validResponseCodes: '200,405,409', wrapAsMultipart: false
     def parsed_pr_merge_response = readJSON text: "${pr_merge_response.content}"
 
     if (parsed_pr_merge_response.containsKey("merged")){
