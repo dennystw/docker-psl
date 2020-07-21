@@ -14,6 +14,28 @@ def details(Pipeline p) {
     println("\u001b[36mMerging to branch : \u001b[0m${p.branch_name}")
 }
 
+def checkPR(Pipeline p) {
+    def git_pr_response = httpRequest authentication: 'github-personal', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/${p.pr_num}", wrapAsMultipart: false
+    def parsed_git_pr_response = readJSON text: "${git_pr_response.content}"
+    
+    println("================\u001b[44mChecking base branch\u001b[0m===============")
+    if ("${parsed_git_pr_response['base']['ref']}" != "${p.branch_name}") {
+        error "Base branch on pull request is different than used in branch, used branch : ${p.branch_name}, your pull request base is pointed to : ${parsed_git_pr_response['base']['ref']}"
+    }
+    println "\u001b[36mBase Branch check \u001b[32mPASSED\u001b[0m"
+    println "==============================================\n\n"
+    
+    println "=============\u001b[44mPull Request Detail\u001b[0m=============="
+    println "\u001b[36mPR Creator : \u001b[0m${parsed_git_pr_response['user']['login']}"
+    println "\u001b[36mRepository : \u001b[0m${parsed_git_pr_response['base']['repo']['html_url']}"
+    println "\u001b[36mHead Branch : \u001b[0m${parsed_git_pr_response['head']['ref']}"
+    println "\u001b[36mBase Branch : \u001b[0m${parsed_git_pr_response['base']['ref']}"
+    println "\u001b[36mMerged Status : \u001b[33m${parsed_git_pr_response['merged']}\u001b[0m"
+    println "==============================================\n\n"
+
+    p.is_merged = "${parsed_git_pr_response['merged']}"
+}
+
 def validation(Pipeline p) {
     if(!p.repository_name) {
         "Repository name can't be empty"
