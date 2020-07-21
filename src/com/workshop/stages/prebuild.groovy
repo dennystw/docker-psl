@@ -16,7 +16,7 @@ def details(Pipeline p) {
 
 def checkPR(Pipeline p) {
     def response = httpRequest authentication: 'github-personal', responseHandle: 'NONE', url: 'https://api.github.com/repos/dimasmamot/tkpd-demo/pulls/1', wrapAsMultipart: false
-    println(response)
+    println(response.content)
 }
 
 def validation(Pipeline p) {
