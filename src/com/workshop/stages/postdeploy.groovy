@@ -25,8 +25,8 @@ def deleteOldImage(Pipeline p) {
         println "Remove old Image"
         println output
 
-        def output2 = sh script: "docker image prune -f",  returnStdout: true
-        println "Remove unused images"
-        println output2
+        //def output2 = sh script: "docker image prune -f",  returnStdout: true
+        //println "Remove unused images"
+        //println output2
     }
 }
