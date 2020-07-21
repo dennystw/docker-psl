@@ -15,8 +15,10 @@ def details(Pipeline p) {
 }
 
 def checkPR(Pipeline p) {
-    def response = httpRequest authentication: 'github-personal', url: 'https://api.github.com/repos/dimasmamot/tkpd-demo/pulls/1', wrapAsMultipart: false
-    println(response.content)
+    def git_pr_response = httpRequest authentication: 'github-personal', url: 'https://api.github.com/repos/dimasmamot/tkpd-demo/pulls/1', wrapAsMultipart: false
+    def parsed_git_pr_response = jsonParse(git_pr_response)
+    
+    println("Git Base : ${parsed_git_pr_response['base']['ref']}")
 }
 
 def validation(Pipeline p) {
