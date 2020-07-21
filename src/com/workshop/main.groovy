@@ -10,7 +10,7 @@ def main(script) {
     // Object initialization
     c = new Config()
     u = new utils()
-    
+
     sprebuild = new prebuild()
     sbuild = new build()
     spostbuild = new postbuild()
@@ -47,17 +47,17 @@ def main(script) {
 
     ansiColor('xterm') {
         stage('Pre Build - Details') {
-            // sprebuild.validation(p)
-            // sprebuild.details(p)
+            sprebuild.validation(p)
+            sprebuild.details(p)
             sprebuild.checkPR(p)
         }
 
         stage('Pre Build - Checkout & Test') {
-            // sprebuild.checkoutBuildTest(p)
+            sprebuild.checkoutBuildTest(p)
         }
 
         stage('Build & Push Image') {
-            // sbuild.build(p)
+            sbuild.build(p)
         }
 
         stage('Merge') {
@@ -65,11 +65,11 @@ def main(script) {
         }
 
         stage('Deploy') {
-            // sdeploy.deploy(p)
+            sdeploy.deploy(p)
         }
 
         stage('Service Healthcheck') {
-            // spostdeploy.healthcheck(p)
+            spostdeploy.healthcheck(p)
         }
     }
 }
