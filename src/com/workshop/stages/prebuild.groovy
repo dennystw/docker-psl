@@ -15,7 +15,7 @@ def details(Pipeline p) {
 }
 
 def checkPR(Pipeline p) {
-    def git_pr_response = httpRequest authentication: 'github-personal', url: 'https://api.github.com/repos/dimasmamot/tkpd-demo/pulls/1', wrapAsMultipart: false
+    def git_pr_response = httpRequest authentication: 'github-personal', url: "https://api.github.com/repos/${p.git_user}/${p.repository_name}/pulls/1", wrapAsMultipart: false
     def parsed_git_pr_response = readJSON text: "${git_pr_response.content}"
     
     println("================\u001b[44mDetails Of Jobs\u001b[0m===============")
