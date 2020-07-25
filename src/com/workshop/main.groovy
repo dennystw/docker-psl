@@ -8,7 +8,6 @@ import com.workshop.stages.*
 def main(script) {
     // Object initialization
     c = new Config()
-    u = new utils()
 
     sprebuild = new prebuild()
     sbuild = new build()
